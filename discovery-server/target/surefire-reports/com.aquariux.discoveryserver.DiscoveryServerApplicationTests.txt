@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.aquariux.discoveryserver.DiscoveryServerApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.423 s - in com.aquariux.discoveryserver.DiscoveryServerApplicationTests

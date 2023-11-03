@@ -1,0 +1,23 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: 'false'
+    fetch-registry: 'false'
+  username: {EUREKA_USERNAME:eureka}
+  password: {EUREKA_PASSWORD:password}
+spring:
+  application:
+    name: discovery-server
+  main:
+    allow-bean-definition-overriding: 'true'
+server:
+  port: '8761'
+management:
+  endpoint:
+    health:
+      show-details: 'always'
+  endpoints:
+    web:
+      exposure:
+        include: '*'
