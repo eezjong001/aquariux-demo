@@ -9,5 +9,4 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
 
     @Query("SELECT t FROM Ticker t WHERE t.symbol = :symbol AND t.TickerType = :TickerType")
     Ticker findBySymbolAndTickerType(String symbol, String TickerType);
-
 }

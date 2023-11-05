@@ -138,18 +138,35 @@ public class TickerService {
         }
     }
 
-    public void fetchBestPrices(String symbol) {
+    public float fetchBestPrices(String symbol) {
 
         Ticker huobiTicker = tickerRepository.findBySymbolAndTickerType(symbol.toLowerCase(),"huobi");
         Ticker binanceTicker = tickerRepository.findBySymbolAndTickerType(symbol.toUpperCase(),"binance");
 
         Float bestPrice = calculateLatestBestAggregatedPrice(binanceTicker, huobiTicker, "1");
 
+        if(huobiTicker == null || binanceTicker == null){
+            return 0.00F;
+        }
+
+        List<Ticker> tickers = new ArrayList<>();
+
+        huobiTicker.setAggregatedPrice(bestPrice);
+        binanceTicker.setAggregatedPrice(bestPrice);
+
+        tickers.add(huobiTicker);
+        tickers.add(binanceTicker);
+
+        tickerRepository.saveAll(tickers);
+
         if(bestPrice != 0.00F) {
+
             System.out.println("Best Price Aggregated is " + bestPrice);
         }else{
             System.out.println("No Matching Data for both binance and huobi");
         }
+
+        return bestPrice;
     }
 
 }

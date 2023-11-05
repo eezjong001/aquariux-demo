@@ -36,8 +36,12 @@ public class TickerController {
     }
     @PostMapping("/fetch-bestprices")
     public ResponseEntity<String> fetchBestPrices(@RequestParam String symbol) {
-        tickerService.fetchBestPrices(symbol);
-        return new ResponseEntity<>("Best Prices Fetched", HttpStatus.OK);
+        Float bestPrice = tickerService.fetchBestPrices(symbol);
+
+        if(bestPrice == 0.00F){
+            return new ResponseEntity<>("-", HttpStatus.OK);
+        }
+        return new ResponseEntity<>(bestPrice.toString(), HttpStatus.OK);
     }
 
     @GetMapping
