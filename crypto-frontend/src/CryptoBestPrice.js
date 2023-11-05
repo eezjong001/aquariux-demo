@@ -26,7 +26,7 @@ useEffect(() => {
   return (
     <div className="container mt-4">
       <div className="table-responsive">
-            <h3 className="mb-3">Best Price</h3>
+            <h3 className="mb-3">Best Price Searcher</h3>
         <table className="table table-bordered table-striped">
           <thead>
             <tr>

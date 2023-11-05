@@ -4,6 +4,8 @@ import axios from 'axios';
 function CryptoTrader() {
   const [selectedCrypto, setSelectedCrypto] = useState(null);
   const [cryptoData, setCryptoData] = useState([]);
+  const [buyQuantity, setBuyQuantity] = useState(0); // Initialize with 0
+  const [sellQuantity, setSellQuantity] = useState(0); // Initialize with 0
 
   useEffect(() => {
 
@@ -17,20 +19,48 @@ function CryptoTrader() {
   }, []);
 
   const handleBuy = () => {
-    if (selectedCrypto) {
+    if (selectedCrypto && buyQuantity > 0) {
+      const buyTransaction = {
+        symbol: selectedCrypto.symbol,
+        price: selectedCrypto.bidPrice,
+        quantity: buyQuantity,
+        userTransactionId: 1,
+        timestamp: new Date().toISOString(),
+      };
 
-      alert(`Buy ${selectedCrypto.symbol}`);
+      axios
+        .post('http://localhost:8080/api/transactions/buy', buyTransaction)
+        .then((response) => {
+          alert('Buy transaction created successfully');
+        })
+        .catch((error) => {
+          console.error('Error creating buy transaction:', error);
+        });
     } else {
-      alert('Please select a cryptocurrency to buy.');
+      alert('Please select a cryptocurrency and enter a valid quantity to buy.');
     }
   };
 
   const handleSell = () => {
-    if (selectedCrypto) {
+    if (selectedCrypto && sellQuantity > 0) {
+      const sellTransaction = {
+        symbol: selectedCrypto.symbol,
+        price: selectedCrypto.askPrice,
+        quantity: sellQuantity,
+        userTransactionId: 1,
+        timestamp: new Date().toISOString(),
+      };
 
-      alert(`Sell ${selectedCrypto.symbol}`);
+      axios
+        .post('http://localhost:8080/api/transactions/sell', sellTransaction)
+        .then((response) => {
+          alert('Sell transaction created successfully');
+        })
+        .catch((error) => {
+          console.error('Error creating sell transaction:', error);
+        });
     } else {
-      alert('Please select a cryptocurrency to sell.');
+      alert('Please select a cryptocurrency and enter a valid quantity to sell.');
     }
   };
 
@@ -60,7 +90,19 @@ function CryptoTrader() {
         </div>
       )}
       <div className="crypto-actions">
+        <input
+          type="number"
+          placeholder="Quantity to Buy"
+          value={buyQuantity}
+          onChange={(e) => setBuyQuantity(parseInt(e.target.value, 10))}
+        />
         <button onClick={handleBuy}>Buy</button>
+        <input
+          type="number"
+          placeholder="Quantity to Sell"
+          value={sellQuantity}
+          onChange={(e) => setSellQuantity(parseInt(e.target.value, 10))}
+        />
         <button onClick={handleSell}>Sell</button>
       </div>
     </div>

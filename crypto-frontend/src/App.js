@@ -7,6 +7,7 @@ import CryptoTable from './CryptoTable';
 import CryptoBestPrice from './CryptoBestPrice';
 import WalletList from './WalletList';
 import CryptoTrader from './CryptoTrader';
+import TradingHistoryTable from './TradingHistoryTable';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // For Testing not defined
@@ -61,6 +62,10 @@ function App() {
 
             <div className="table-wrapper">
                <CryptoTrader/>
+            </div>
+
+            <div className="table-wrapper">
+               <TradingHistoryTable userTransactionId={userId} />
             </div>
 
           </div>

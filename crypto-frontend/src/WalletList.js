@@ -20,7 +20,7 @@ function WalletList({ userId }) {
 
   return (
     <div className="container mt-4">
-      <h3 className="mb-3">Wallet List</h3>
+      <h3 className="mb-3">Your Wallets</h3>
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
