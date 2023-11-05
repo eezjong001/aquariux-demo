@@ -10,6 +10,7 @@ import org.json.JSONException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,21 +26,19 @@ public class TickerService {
     @Autowired
     private TickerRepository tickerRepository;
     @Autowired
-    private RestTemplate restTemplate; // You need to configure and inject RestTemplate
-
+    private RestTemplate restTemplate;
+    @Scheduled(fixedRate = 10000) // Run every 10 seconds
     public void fetchAndStoreBinancePrices() {
-        // Fetch prices from Binance and Huobi using their APIs
+        System.out.println("fetchAndStoreBinancePrices Executing" + System.currentTimeMillis());
         try {
-            // Fetch prices from Binance and Huobi using their APIs
+
             ResponseEntity<String> binanceResponse = restTemplate.getForEntity("https://api.binance.com/api/v3/ticker/bookTicker", String.class);
 
-            // Parse the JSON responses
             JSONArray binanceArray = new JSONArray(binanceResponse.getBody());
 
-            // Create a list to store Ticker objects
             List<Ticker> tickers = new ArrayList<>();
 
-            // Process Binance data
+            //Process Binance data
             for (int i = 0; i < binanceArray.length(); i++) {
                 JSONObject binanceObject = binanceArray.getJSONObject(i);
 
@@ -75,35 +74,34 @@ public class TickerService {
 
             }
 
-            // Save the list of Ticker objects to the database
+            //Save the list of Ticker objects to the database
             tickerRepository.saveAll(tickers);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    @Scheduled(fixedRate = 10000) // Run every 10 seconds
     public void fetchAndStoreHuobiPrices() {
-        // Fetch prices from Binance and Huobi using their APIs
+        System.out.println("fetchAndStoreHuobiPrices Executing" + System.currentTimeMillis());
+
         try {
-            // Fetch prices from Binance and Huobi using their APIs
+
             ResponseEntity<String> huobiResponse = restTemplate.getForEntity("https://api.huobi.pro/market/tickers", String.class);
             JSONObject responseJson = new JSONObject(huobiResponse.getBody());
+
             String dataJsonString = responseJson.optString("data");
 
-            // Parse the JSON responses
             JSONArray huobiArray = new JSONArray(dataJsonString);
 
-            // Create a list to store Ticker objects
             List<Ticker> tickers = new ArrayList<>();
 
-            // Process Huobi data
+            //Process Huobi data
             for (int i = 0; i < huobiArray.length(); i++) {
                 JSONObject huobiObject = huobiArray.getJSONObject(i);
                 String symbol = huobiObject.getString("symbol");
                 String tickerType = "huobi";
-                // Check if a Ticker with the same symbol already exists in the database
-
+                //Check if a Ticker with the same symbol already exists in the database
                 Ticker existingTicker = tickerRepository.findBySymbolAndTickerType(symbol.toLowerCase(),tickerType.toLowerCase());
 
                     if(existingTicker == null) {
@@ -114,7 +112,6 @@ public class TickerService {
                         ticker.setBidQty(huobiObject.getFloat("bidSize"));
                         ticker.setAskPrice(huobiObject.getFloat("ask"));
                         ticker.setAskQty(huobiObject.getFloat("askSize"));
-                        // Set other fields as needed
                         tickers.add(ticker);
                     }else if(existingTicker.getSymbol().equalsIgnoreCase(symbol) && existingTicker.getTickerType().equalsIgnoreCase(tickerType)){
                         if(existingTicker.getBidPrice() != huobiObject.getFloat("bid")){
@@ -133,7 +130,7 @@ public class TickerService {
                     }
             }
 
-            // Save the list of Ticker objects to the database
+            //Save the list of Ticker objects to the database
             tickerRepository.saveAll(tickers);
 
         } catch (Exception e) {
