@@ -6,6 +6,7 @@ import LoginForm from './LoginForm';
 import CryptoTable from './CryptoTable';
 import CryptoBestPrice from './CryptoBestPrice';
 import WalletList from './WalletList';
+import CryptoTrader from './CryptoTrader';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // For Testing not defined
@@ -57,6 +58,11 @@ function App() {
             <div className="table-wrapper">
                <WalletList userId={userId} />
             </div>
+
+            <div className="table-wrapper">
+               <CryptoTrader/>
+            </div>
+
           </div>
         </div>
       ) : (
