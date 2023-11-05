@@ -1,0 +1,25 @@
+.crypto-table-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+
+.table-scroll {
+  max-height: 300px; 
+  overflow-y: scroll;
+}

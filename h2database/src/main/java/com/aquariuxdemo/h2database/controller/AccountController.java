@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
@@ -65,6 +68,21 @@ public class AccountController {
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to create account: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/get-demo-credentials")
+    public ResponseEntity<Map<String, String>> getAccountCredentials() {
+        // Fetch the account credentials from your database
+        String username = accountRepository.findByUsername("demo").getUsername();
+        String password = accountRepository.findByUsername("demo").getPassword();
+
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("username", username);
+        credentials.put("password", password);
+
+        System.out.println("Sending Account Details " + username + " / " + password);
+
+        return ResponseEntity.ok(credentials);
     }
 
 }
