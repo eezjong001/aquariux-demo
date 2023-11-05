@@ -6,10 +6,7 @@ import com.aquariuxdemo.h2database.service.TickerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -37,7 +34,11 @@ public class TickerController {
         tickerService.fetchAndStoreHuobiPrices();
         return new ResponseEntity<>("Huobi Prices fetched and stored successfully", HttpStatus.OK);
     }
-
+    @PostMapping("/fetch-bestprices")
+    public ResponseEntity<String> fetchBestPrices(@RequestParam String symbol) {
+        tickerService.fetchBestPrices(symbol);
+        return new ResponseEntity<>("Best Prices Fetched", HttpStatus.OK);
+    }
 
     @GetMapping
     public List<Ticker> getAllTickers() {

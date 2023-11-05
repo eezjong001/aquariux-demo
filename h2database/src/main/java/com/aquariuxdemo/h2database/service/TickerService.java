@@ -45,7 +45,7 @@ public class TickerService {
                 String symbol = binanceObject.getString("symbol");
                 String tickerType = "binance";
 
-                Ticker existingTicker = tickerRepository.findBySymbolAndTickerType(symbol.toLowerCase(),tickerType.toLowerCase());
+                Ticker existingTicker = tickerRepository.findBySymbolAndTickerType(symbol.toUpperCase(),tickerType.toLowerCase());
 
                 if(existingTicker == null) {
                     Ticker ticker = new Ticker();
@@ -135,6 +135,20 @@ public class TickerService {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void fetchBestPrices(String symbol) {
+
+        Ticker huobiTicker = tickerRepository.findBySymbolAndTickerType(symbol.toLowerCase(),"huobi");
+        Ticker binanceTicker = tickerRepository.findBySymbolAndTickerType(symbol.toUpperCase(),"binance");
+
+        Float bestPrice = calculateLatestBestAggregatedPrice(binanceTicker, huobiTicker, "1");
+
+        if(bestPrice != 0.00F) {
+            System.out.println("Best Price Aggregated is " + bestPrice);
+        }else{
+            System.out.println("No Matching Data for both binance and huobi");
         }
     }
 

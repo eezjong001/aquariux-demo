@@ -1,38 +1,34 @@
 package com.aquariuxdemo.h2database;
 
+import com.aquariuxdemo.h2database.entity.Ticker;
 import org.json.JSONObject;
 
 public class util {
 
-    public static float calculateLatestBestAggregatedPrice(String binanceData, String huobiData, String identifier) {
+    public static float calculateLatestBestAggregatedPrice(Ticker binanceData, Ticker huobiData, String identifier) {
         try {
-            //System.out.println("data util");
-            //System.out.println(binanceData);
-            //System.out.println(huobiData);
 
-            // Parse JSON responses from Binance and Huobi
-            JSONObject binanceJson = new JSONObject(binanceData);
-            JSONObject huobiJson = new JSONObject(huobiData);
+            if(binanceData != null && huobiData != null) {
 
-            // Extract bid and ask prices from both sources
-            float binanceBidPrice = Float.parseFloat(binanceJson.getString("bidPrice"));
-            float binanceAskPrice = Float.parseFloat(binanceJson.getString("askPrice"));
+                float binanceBidPrice = binanceData.getBidPrice();
+                float binanceAskPrice = binanceData.getAskPrice();
 
-            float huobiBidPrice = Float.parseFloat(huobiJson.getString("bid"));
-            float huobiAskPrice = Float.parseFloat(huobiJson.getString("ask"));
+                float huobiBidPrice = huobiData.getBidPrice();
+                float huobiAskPrice = huobiData.getAskPrice();
 
-            // Calculate the best aggregated bid and ask prices
-            float bestBidPrice = Math.min(binanceBidPrice, huobiBidPrice);
-            float bestAskPrice = Math.max(binanceAskPrice, huobiAskPrice);
 
-            // You can return the best aggregated bid or ask price, or both as needed
-            // For exampleturn, re the average of the best bid and ask prices
-            float bestAggregatedPrice = (bestBidPrice + bestAskPrice) / 2.0F;
-            if(identifier.equals("1")) return bestAggregatedPrice;
-            if(identifier.equals("2")) return bestBidPrice;
-            if(identifier.equals("3")) return bestAskPrice;
+                float bestBidPrice = Math.min(binanceBidPrice, huobiBidPrice);
+                float bestAskPrice = Math.max(binanceAskPrice, huobiAskPrice);
 
-            return -1.0F;
+
+                float bestAggregatedPrice = (bestBidPrice + bestAskPrice) / 2.0F;
+                if (identifier.equals("1")) return bestAggregatedPrice;
+                if (identifier.equals("2")) return bestBidPrice;
+                if (identifier.equals("3")) return bestAskPrice;
+            }else{
+                return -0.00F; // no matching data to aggregate
+            }
+            return -0.00F;
         } catch (Exception e) {
 
             e.printStackTrace();
