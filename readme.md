@@ -12,5 +12,7 @@ How to use this demo
 - Crypto Table, this pulls live API that updates at the backend every 10 seconds from two sources , binance and huobi
 - Best Price Checker, this checks the best aggregated price (binance +huobi tickers) prices dynamically as the field changes to show the prices for them
 - Wallets, this shows the Account holder's curret wallets details and balance
-- Crypto Trader, this portion allows the user to buy and sell crypto populated from a list in the DB
+- Crypto Trader, this portion allows the user to buy and sell crypto populated from a list in the DB , buying or selling will update the trading history AND wallets
 - Trading History, this tracks the users buy and sell activities and refreshes every 2 seconds with the most updated list
+
+10. Still some bugs here and there and the application architecture is a bit sub-optimal due to time constraints.

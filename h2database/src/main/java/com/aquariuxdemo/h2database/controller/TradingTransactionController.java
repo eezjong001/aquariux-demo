@@ -30,33 +30,50 @@ public class TradingTransactionController {
                 .filter(wallet -> wallet.getCurrency().equals(buyTransaction.getSymbol()))
                 .findFirst();
 
-        if (matchingWallet.isPresent()) {
-            Wallet wallet = matchingWallet.get();
-            Float totalCost = buyTransaction.getPrice() * buyTransaction.getQuantity();
+        Optional<Wallet> usdtWallet = wallets.stream()
+                .filter(wallet -> wallet.getCurrency().equals("USDT"))
+                .findFirst();
+        if(usdtWallet.isPresent()) {
+            Wallet walletmain = usdtWallet.get();
 
-                wallet.setBalance(wallet.getBalance()+totalCost);
+            if (matchingWallet.isPresent()) {
+                Wallet wallet = matchingWallet.get();
+                Float totalCost = buyTransaction.getPrice() * buyTransaction.getQuantity();
 
-        } else {
-            // Create a new wallet if it doesn't exist
-            Wallet newWallet = new Wallet();
-            newWallet.setUserWalletId(buyTransaction.getUserTransactionId());
-            newWallet.setCurrency(buyTransaction.getSymbol());
-            System.out.println("buy price :" + buyTransaction.getPrice() );
-            System.out.println("buy qty :" + buyTransaction.getQuantity() );
-            newWallet.setBalance(buyTransaction.getPrice() * buyTransaction.getQuantity());
+                wallet.setBalance(wallet.getBalance() + totalCost);
 
-            //Float totalCost = buyTransaction.getPrice()*(buyTransaction.getQuantity());
+                if (walletmain.getBalance() >= (buyTransaction.getPrice() * buyTransaction.getQuantity())) {
+                    // Deduct the total cost from the wallet's balance
+                    walletmain.setBalance(walletmain.getBalance() - totalCost);
+                } else {
+                    return new ResponseEntity<>("Insufficient balance in the wallet.", HttpStatus.BAD_REQUEST);
+                }
 
-            // Deduct the total cost from the wallet's balance
-            //newWallet.setBalance(newWallet.getBalance()-totalCost);
+            } else {
+                // Create a new wallet if it doesn't exist
+                Wallet newWallet = new Wallet();
+                newWallet.setUserWalletId(buyTransaction.getUserTransactionId());
+                newWallet.setCurrency(buyTransaction.getSymbol());
+                System.out.println("buy price :" + buyTransaction.getPrice());
+                System.out.println("buy qty :" + buyTransaction.getQuantity());
+                newWallet.setBalance(buyTransaction.getPrice() * buyTransaction.getQuantity());
 
-            // Add the new wallet to the list of wallets
-            wallets.add(newWallet);
-            walletRepository.saveAll(wallets);
-        }
+                //Float totalCost = buyTransaction.getPrice()*(buyTransaction.getQuantity());
+
+                // Deduct the total cost from the wallet's balance
+                //newWallet.setBalance(newWallet.getBalance()-totalCost);
+
+                // Add the new wallet to the list of wallets
+                wallets.add(newWallet);
+                walletRepository.saveAll(wallets);
+            }
 
         transactionRepository.save(buyTransaction);
         return new ResponseEntity<>("Buy transaction created successfully", HttpStatus.CREATED);
+        }
+        else{
+            return new ResponseEntity<>("USDT wallet not found.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     // Endpoint for selling crypto
@@ -70,25 +87,35 @@ public class TradingTransactionController {
                 .filter(wallet -> wallet.getCurrency().equals(sellTransaction.getSymbol()))
                 .findFirst();
 
-        if (matchingWallet.isPresent()) {
-            Wallet wallet = matchingWallet.get();
-            Float totalCost = sellTransaction.getPrice() * sellTransaction.getQuantity();
+        Optional<Wallet> usdtWallet = wallets.stream()
+                .filter(wallet -> wallet.getCurrency().equals("USDT"))
+                .findFirst();
+        if(usdtWallet.isPresent()) {
+            Wallet walletmain = usdtWallet.get();
 
-            // Check if the wallet has enough balance
-            if (wallet.getBalance() >= (sellTransaction.getPrice() * sellTransaction.getQuantity())) {
-                // Deduct the total cost from the wallet's balance
-                wallet.setBalance(wallet.getBalance()-totalCost);
+            if (matchingWallet.isPresent()) {
+                Wallet wallet = matchingWallet.get();
+                Float totalCost = sellTransaction.getPrice() * sellTransaction.getQuantity();
+
+                // Check if the wallet has enough balance
+                if (wallet.getBalance() >= (sellTransaction.getPrice() * sellTransaction.getQuantity())) {
+                    // Deduct the total cost from the wallet's balance
+                    wallet.setBalance(wallet.getBalance() - totalCost);
+                    walletmain.setBalance(walletmain.getBalance() + totalCost);
+                } else {
+                    return new ResponseEntity<>("Insufficient balance in the wallet.", HttpStatus.BAD_REQUEST);
+                }
             } else {
                 return new ResponseEntity<>("Insufficient balance in the wallet.", HttpStatus.BAD_REQUEST);
+                //Wallet must already exist to sell
+
             }
-        } else {
-            return new ResponseEntity<>("Insufficient balance in the wallet.", HttpStatus.BAD_REQUEST);
-            //Wallet must already exist to sell
 
+            transactionRepository.save(sellTransaction);
+            return new ResponseEntity<>("Sell transaction successful", HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity<>("USDT wallet not found.", HttpStatus.BAD_REQUEST);
         }
-
-        transactionRepository.save(sellTransaction);
-        return new ResponseEntity<>("Sell transaction successful", HttpStatus.CREATED);
     }
 
     @GetMapping("/history")
