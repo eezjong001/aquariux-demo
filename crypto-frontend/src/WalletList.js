@@ -4,7 +4,7 @@ import axios from 'axios';
 function WalletList({ userId }) {
   const [wallets, setWallets] = useState([]);
 
-  useEffect(() => {
+const fetchWalletHistory = () => {
   axios.get(`http://localhost:8080/api/wallets/balance`, {
     params: {
       id: userId,
@@ -16,6 +16,17 @@ function WalletList({ userId }) {
     .catch((error) => {
       console.error('Error fetching wallets:', error);
     });
+}
+  useEffect(() => {
+
+  fetchWalletHistory();
+
+  const intervalId = setInterval(fetchWalletHistory, 2000);
+
+  return () => {
+     clearInterval(intervalId);
+  };
+
 }, [userId]);
 
   return (

@@ -24,39 +24,35 @@ public class TradingTransactionController {
     public ResponseEntity<?> buyCrypto(@RequestBody TradingTransaction buyTransaction) {
         buyTransaction.setTransactionType("buy");
         // Fetch user's wallets
-        List<Wallet> wallets = walletRepository.findByUserWalletId(String.valueOf(buyTransaction.getUserTransactionId()));
+        List<Wallet> wallets = walletRepository.findByUserWalletId("1");
 
         Optional<Wallet> matchingWallet = wallets.stream()
                 .filter(wallet -> wallet.getCurrency().equals(buyTransaction.getSymbol()))
                 .findFirst();
 
-
-
         if (matchingWallet.isPresent()) {
             Wallet wallet = matchingWallet.get();
             Float totalCost = buyTransaction.getPrice() * buyTransaction.getQuantity();
 
-            // Check if the wallet has enough balance
-            if (wallet.getBalance() >= 0) {
-                // Deduct the total cost from the wallet's balance
-                wallet.setBalance(wallet.getBalance()-totalCost);
-            } else {
-                return new ResponseEntity<>("Insufficient balance in the wallet.", HttpStatus.BAD_REQUEST);
-            }
+                wallet.setBalance(wallet.getBalance()+totalCost);
+
         } else {
             // Create a new wallet if it doesn't exist
             Wallet newWallet = new Wallet();
             newWallet.setUserWalletId(buyTransaction.getUserTransactionId());
             newWallet.setCurrency(buyTransaction.getSymbol());
+            System.out.println("buy price :" + buyTransaction.getPrice() );
+            System.out.println("buy qty :" + buyTransaction.getQuantity() );
             newWallet.setBalance(buyTransaction.getPrice() * buyTransaction.getQuantity());
 
-            Float totalCost = buyTransaction.getPrice()*(buyTransaction.getQuantity());
+            //Float totalCost = buyTransaction.getPrice()*(buyTransaction.getQuantity());
 
             // Deduct the total cost from the wallet's balance
-            newWallet.setBalance(newWallet.getBalance()-totalCost);
+            //newWallet.setBalance(newWallet.getBalance()-totalCost);
 
             // Add the new wallet to the list of wallets
             wallets.add(newWallet);
+            walletRepository.saveAll(wallets);
         }
 
         transactionRepository.save(buyTransaction);
@@ -74,33 +70,21 @@ public class TradingTransactionController {
                 .filter(wallet -> wallet.getCurrency().equals(sellTransaction.getSymbol()))
                 .findFirst();
 
-
-
         if (matchingWallet.isPresent()) {
             Wallet wallet = matchingWallet.get();
             Float totalCost = sellTransaction.getPrice() * sellTransaction.getQuantity();
 
             // Check if the wallet has enough balance
-            if (wallet.getBalance() >= 0) {
+            if (wallet.getBalance() >= (sellTransaction.getPrice() * sellTransaction.getQuantity())) {
                 // Deduct the total cost from the wallet's balance
                 wallet.setBalance(wallet.getBalance()-totalCost);
             } else {
                 return new ResponseEntity<>("Insufficient balance in the wallet.", HttpStatus.BAD_REQUEST);
             }
         } else {
-            // Create a new wallet if it doesn't exist
-            Wallet newWallet = new Wallet();
-            newWallet.setUserWalletId(sellTransaction.getUserTransactionId());
-            newWallet.setCurrency(sellTransaction.getSymbol());
-            newWallet.setBalance(sellTransaction.getPrice() * sellTransaction.getQuantity());
+            return new ResponseEntity<>("Insufficient balance in the wallet.", HttpStatus.BAD_REQUEST);
+            //Wallet must already exist to sell
 
-            Float totalCost = sellTransaction.getPrice()*(sellTransaction.getQuantity());
-
-            // Deduct the total cost from the wallet's balance
-            newWallet.setBalance(newWallet.getBalance()-totalCost);
-
-            // Add the new wallet to the list of wallets
-            wallets.add(newWallet);
         }
 
         transactionRepository.save(sellTransaction);
